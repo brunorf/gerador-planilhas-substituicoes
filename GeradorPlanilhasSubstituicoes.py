@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import uno
 from com.sun.star.script.provider import XScript  # type: ignore
-import unicodedata
+# import unicodedata
 from calendar import monthrange
 
 # import apso_utils  # type: ignore
@@ -91,10 +91,10 @@ def get_nome_mes(numero_mes):
 
 
 def str_norm(string):
-    nfkd_form = unicodedata.normalize('NFKD', string)
-    ascii = nfkd_form.encode('ASCII', 'ignore')
-    ascii_string = ascii.decode()
-    return " ".join(ascii_string.split()).strip().lower()
+    # nfkd_form = unicodedata.normalize('NFKD', string)
+    # ascii = nfkd_form.encode('ASCII', 'ignore')
+    # ascii_string = ascii.decode()
+    return " ".join(string.split()).strip().lower()
 
 
 # compara se dois nomes são iguais
