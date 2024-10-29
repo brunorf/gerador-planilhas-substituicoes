@@ -105,26 +105,21 @@ def nomes_iguais(nome1, nome2):
 
 def preenche_substitutos():
     planilhas = get_planilhas()
-    for nome_planilha_titular in NOMES_PLANILHAS:
+    pla = planilhas.getByName(PLA_SUP)
 
-        pla = planilhas.getByName(
-            NOMES_PLANILHAS[nome_planilha_titular]['subs'])
+    matricula = None
+    linha = 2
+    while matricula != "":
+        matricula = pla.getCellRangeByName(f"A{linha}").getString()
 
-        nome_substituto = None
-        linha = 2
-        while nome_substituto != "":
-            nome_substituto = str_norm(
-                pla.getCellRangeByName(f"B{linha}").getString())
+        if matricula != "":
+            matricula_titular = pla.getCellRangeByName(f"L{linha}").getString()
+            substituto = cria_substituto_da_planilha(
+                pla, linha,
+            )
+            titulares[matricula_titular].substitutos.append(substituto)
 
-            if nome_substituto != "":
-                nome_titular = str_norm(
-                    pla.getCellRangeByName(f"L{linha}").getString())
-                substituto = cria_substituto_da_planilha(
-                    pla, linha,
-                )
-                titulares[nome_titular].substitutos.append(substituto)
-
-            linha += 1
+        linha += 1
 
 # cria um objeto Servidor a partir de uma linha da planilha
 # serve tanto para titulares quanto para substitutos
@@ -209,22 +204,21 @@ def cria_substituto_da_planilha(
 # percorrendo todas as planilhas de titulares
 def preenche_titulares():
     planilhas = get_planilhas()
-    for nome_planilha_titular in NOMES_PLANILHAS:
-        pla = planilhas.getByName(nome_planilha_titular)
+    pla = planilhas.getByName(PLA_TIT)
 
-        nome = None
-        linha = 2
-        while nome != "":
-            nome = str_norm(pla.getCellRangeByName(f"B{linha}").getString())
+    matricula = None
+    linha = 2
+    while matricula != "":
+        matricula = pla.getCellRangeByName(f"A{linha}").getString()
 
-            if nome != "":
-                titular = cria_titular_da_planilha(
-                    pla,
-                    linha,
-                )
+        if matricula != "":
+            titular = cria_titular_da_planilha(
+                pla,
+                linha,
+            )
 
-                titulares[nome] = titular
-            linha += 1
+            titulares[matricula] = titular
+        linha += 1
 
 
 # preenche a lista de valores de GRs
