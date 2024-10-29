@@ -43,7 +43,6 @@ class Servidor:
         super().__init__()
         self.nome_formatado = None
         self.nome = None
-        self.tipo = None
         self.matricula = None
         self.funcao_titular = None
         self.lotacao = None
@@ -121,14 +120,7 @@ def preenche_substitutos():
                 nome_titular = str_norm(
                     pla.getCellRangeByName(f"L{linha}").getString())
                 substituto = cria_substituto_da_planilha(
-                    pla, linha, NOMES_PLANILHAS[nome_planilha_titular]['tipo'],
-                    col_nome="B",
-                    col_matricula="A",
-                    col_lotacao="C",
-                    col_funcao_titular="D",
-                    col_funcao_confianca="E",
-
-                    col_ins="G",
+                    pla, linha,
                 )
                 titulares[nome_titular].substitutos.append(substituto)
 
@@ -143,7 +135,6 @@ def preenche_substitutos():
 def cria_servidor_da_planilha(
     planilha,
     linha,
-    tipo_servidor,
     classe_objeto_servidor,
     col_matricula="A",
     col_nome="B",
@@ -188,7 +179,6 @@ def cria_servidor_da_planilha(
         planilha.getCellRangeByName(f"{col_valor_404}{linha}").getString()
     )
 
-    servidor.tipo = tipo_servidor
     return servidor
 
 
@@ -196,19 +186,17 @@ def cria_servidor_da_planilha(
 def cria_titular_da_planilha(
     planilha,
     linha,
-    tipo,
 ):
-    return cria_servidor_da_planilha(planilha, linha, tipo, Titular)
+    return cria_servidor_da_planilha(planilha, linha, Titular)
 
 
 # cria um objeto Substituto a partir de uma linha da planilha
 def cria_substituto_da_planilha(
     planilha,
     linha,
-    tipo,
     col_ordem_substituicao="J",
 ):
-    substituto = cria_servidor_da_planilha(planilha, linha, tipo, Substituto)
+    substituto = cria_servidor_da_planilha(planilha, linha, Substituto)
     substituto.ordem_substituicao = int(
         planilha.getCellRangeByName(
             f"{col_ordem_substituicao}{linha}").getValue()
@@ -233,7 +221,6 @@ def preenche_titulares():
                 titular = cria_titular_da_planilha(
                     pla,
                     linha,
-                    NOMES_PLANILHAS[nome_planilha_titular]["tipo"],
                 )
 
                 titulares[nome] = titular
