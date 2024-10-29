@@ -22,6 +22,10 @@ PLA_COORD_POS_SUPL = "Coordenadores Pós-Graduação - Suplentes"
 PLA_TEC_ADM_TIT = "Tec. Adm. - Titulares"
 PLA_TEC_ADM_SUB = "Tec. Adm. - Substitutos"
 
+PLA_TIT = "Titulares"
+PLA_SUP = "Suplentes"
+PLA_OCO = "Ocorrências"
+
 titulares = {}
 valores_grs = {}
 
