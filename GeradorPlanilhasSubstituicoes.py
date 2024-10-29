@@ -247,15 +247,20 @@ def gera_planilhas_substituicoes():
     pla_oco = planilhas.getByName(PLA_OCOR)
 
     linha = 2
-    nome = None
-    while nome != "":
-        nome = str_norm(pla_oco.getCellRangeByName(f"C{linha}").getString())
+    matricula = None
+    while matricula != "":
+        matricula = pla_oco.getCellRangeByName(f"D{linha}").getString()
+
+        # verifica se a matrícula é válida (evita #N/A e erros de digitação)
+        if not matricula.replace("-","").isnumeric():
+            linha += 1
+            continue
 
         # sanity check:
         # verifica se o nome que consta na ocorrência está
         # na tabela de titulares
-        if nome in titulares:
-            titular = titulares[nome]
+        if matricula in titulares:
+            titular = titulares[matricula]            
             titular.motivo_impedimento = pla_oco.getCellRangeByName(
                 f"F{linha}").getString()
 
@@ -273,6 +278,7 @@ def gera_planilhas_substituicoes():
             # apaga o botão Gerar Planilhas
             colunas = planilha_substituicao.getColumns()
             colunas.removeByIndex(11, 2)
+
 
             pla_modelo = planilhas.getByName(PLA_MODL)
 
