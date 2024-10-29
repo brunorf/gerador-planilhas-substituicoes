@@ -145,13 +145,15 @@ def cria_servidor_da_planilha(
     linha,
     tipo_servidor,
     classe_objeto_servidor,
+    col_matricula="A",
     col_nome="B",
     col_lotacao="C",
-    col_matricula="A",
-    col_funcao_titular="D",
-    col_funcao_confianca="E",
-    col_ins="G",
-    col_categoria="F",
+    col_funcao_confianca="D",
+    col_categoria="E",
+    col_ins="F",
+    col_valor_275="G",
+    col_valor_402="H",
+    col_valor_404="I",
 ):
     servidor = classe_objeto_servidor()
     servidor.matricula = planilha.getCellRangeByName(
@@ -165,9 +167,6 @@ def cria_servidor_da_planilha(
     )
     servidor.lotacao = planilha.getCellRangeByName(
         f"{col_lotacao}{linha}").getString()
-    servidor.funcao_titular = planilha.getCellRangeByName(
-        f"{col_funcao_titular}{linha}"
-    ).getString()
     servidor.funcao_confianca = planilha.getCellRangeByName(
         f"{col_funcao_confianca}{linha}"
     ).getString()
@@ -178,6 +177,17 @@ def cria_servidor_da_planilha(
     servidor.categoria = (
         planilha.getCellRangeByName(f"{col_categoria}{linha}").getString()
     )
+
+    servidor.valor_275 = (
+        planilha.getCellRangeByName(f"{col_valor_275}{linha}").getString()
+    )
+    servidor.valor_402 = (
+        planilha.getCellRangeByName(f"{col_valor_402}{linha}").getString()
+    )
+    servidor.valor_404 = (
+        planilha.getCellRangeByName(f"{col_valor_404}{linha}").getString()
+    )
+
     servidor.tipo = tipo_servidor
     return servidor
 
@@ -187,12 +197,6 @@ def cria_titular_da_planilha(
     planilha,
     linha,
     tipo,
-    col_nome="B",
-    col_lotacao="C",
-    col_matricula="A",
-    col_funcao_titular="D",
-    col_funcao_confianca="E",
-    col_ins="F",
 ):
     return cria_servidor_da_planilha(planilha, linha, tipo, Titular)
 
@@ -202,28 +206,13 @@ def cria_substituto_da_planilha(
     planilha,
     linha,
     tipo,
-    col_nome="B",
-    col_lotacao="C",
-    col_matricula="A",
-    col_funcao_titular="D",
-    col_funcao_confianca="E",
-    col_ordem_substituicao="K",
-    col_valor_275="H",
-    col_valor_402="I",
-    col_valor_404="J",
-    col_ins="F",
+    col_ordem_substituicao="J",
 ):
     substituto = cria_servidor_da_planilha(planilha, linha, tipo, Substituto)
     substituto.ordem_substituicao = int(
         planilha.getCellRangeByName(
             f"{col_ordem_substituicao}{linha}").getValue()
     )
-    substituto.valor_275 = planilha.getCellRangeByName(
-        f"{col_valor_275}{linha}").getString()
-    substituto.valor_402 = planilha.getCellRangeByName(
-        f"{col_valor_402}{linha}").getString()
-    substituto.valor_404 = planilha.getCellRangeByName(
-        f"{col_valor_404}{linha}").getString()
 
     return substituto
 
@@ -294,15 +283,16 @@ def gera_planilhas_substituicoes():
 
             # insere uma planilha no final com o nome do titular
             if not planilhas.hasByName(titular.nome_formatado):
-                #planilhas.insertNewByName(titular.nome_formatado, planilhas.Count)
-                planilhas.copyByName(PLA_MODL, titular.nome_formatado, planilhas.Count)
+                # planilhas.insertNewByName(titular.nome_formatado, planilhas.Count)
+                planilhas.copyByName(
+                    PLA_MODL, titular.nome_formatado, planilhas.Count)
 
             planilha_substituicao = planilhas.getByName(titular.nome)
-            
+
             # apaga o botão Gerar Planilhas
             colunas = planilha_substituicao.getColumns()
             colunas.removeByIndex(11, 2)
-            
+
             pla_modelo = planilhas.getByName(PLA_MODL)
 
             cels_origem = pla_modelo.getCellRangeByName("A:J")
@@ -375,7 +365,6 @@ def gera_planilhas_substituicoes():
             planilha_substituicao.getCellRangeByName("E46").setFormula(
                 f"=(G38/30)*{titular.dias_ocorrencia}"
             )
-            
 
             if primeiro_subs.deduzir_insalubridade:
                 planilha_substituicao.getCellRangeByName("G46").setFormula(
@@ -384,7 +373,8 @@ def gera_planilhas_substituicoes():
 
                 # mostra o número de dias a serem deduzidos se o SIM for marcado
                 planilha_substituicao.getCellRangeByName("I46").setFormula(
-                    monthrange(int(ano_ocorrencia), int(mes_ocorrencia))[1] - titular.dias_ocorrencia
+                    monthrange(int(ano_ocorrencia), int(mes_ocorrencia))[
+                        1] - titular.dias_ocorrencia
                 )
             else:
                 planilha_substituicao.getCellRangeByName("G48").setFormula(
