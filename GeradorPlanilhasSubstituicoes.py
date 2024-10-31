@@ -48,7 +48,6 @@ class Titular(Servidor):
         self.motivo_impedimento = None
         self.dias_ocorrencia = 0
         self.substitutos = []
-        self.substitutos = []
 
 
 def get_doc():
