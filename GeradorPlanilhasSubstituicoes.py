@@ -219,6 +219,12 @@ def preenche_valores_grs():
         linha += 1
 
 
+def ordena_substitutos():
+    for matricula in titulares:
+        titulares[matricula].substitutos = sorted(
+            titulares[matricula].substitutos, key=lambda sub: sub.ordem_substituicao)
+
+
 # gera as planilhas de substituição
 # percorrendo a planilha de ocorrências
 # e para cada titular presente na planilha de ocorrências
@@ -359,5 +365,6 @@ def gera_planilhas_substituicoes():
 def main(arg):
     preenche_titulares()
     preenche_substitutos()
+    ordena_substitutos()
     preenche_valores_grs()
     gera_planilhas_substituicoes()
