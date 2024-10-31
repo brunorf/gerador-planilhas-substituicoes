@@ -11,31 +11,13 @@ from calendar import monthrange
 TIPO_TEC_ADM = "Técnico Administrativo"
 TIPO_DOC = "Docente"
 
-PLA_MODL = "Modelo"
-PLA_OCOR = "Ocorrências"
-PLA_CHEFE_DEP_TIT = "Chefes de Departamento - Titulares"
-PLA_CHEFE_DEP_SUPL = "Chefes de Departamento - Suplentes"
-PLA_COORD_GRAD_TIT = "Coordenadores Graduação - Titulares"
-PLA_COORD_GRAD_SUPL = "Coordenadores Graduação - Suplentes"
-PLA_COORD_POS_TIT = "Coordenadores Pós-Graduação - Titulares"
-PLA_COORD_POS_SUPL = "Coordenadores Pós-Graduação - Suplentes"
-PLA_TEC_ADM_TIT = "Tec. Adm. - Titulares"
-PLA_TEC_ADM_SUB = "Tec. Adm. - Substitutos"
-
 PLA_TIT = "Titulares"
 PLA_SUP = "Suplentes"
 PLA_OCO = "Ocorrências"
+PLA_MODL = "Modelo"
 
 titulares = {}
 valores_grs = {}
-
-
-NOMES_PLANILHAS = {
-    PLA_CHEFE_DEP_TIT: {"subs": PLA_CHEFE_DEP_SUPL, "tipo": TIPO_DOC},
-    PLA_COORD_GRAD_TIT: {"subs": PLA_COORD_GRAD_SUPL, "tipo": TIPO_DOC},
-    PLA_COORD_POS_TIT: {"subs": PLA_COORD_POS_SUPL, "tipo": TIPO_DOC},
-    PLA_TEC_ADM_TIT: {"subs": PLA_TEC_ADM_SUB, "tipo": TIPO_TEC_ADM},
-}
 
 
 class Servidor:
@@ -244,7 +226,7 @@ def preenche_valores_grs():
 # do titular e de seu substituto
 def gera_planilhas_substituicoes():
     planilhas = get_planilhas()
-    pla_oco = planilhas.getByName(PLA_OCOR)
+    pla_oco = planilhas.getByName(PLA_OCO)
 
     linha = 2
     matricula = None
@@ -252,7 +234,7 @@ def gera_planilhas_substituicoes():
         matricula = pla_oco.getCellRangeByName(f"D{linha}").getString()
 
         # verifica se a matrícula é válida (evita #N/A e erros de digitação)
-        if not matricula.replace("-","").isnumeric():
+        if not matricula.replace("-", "").isnumeric():
             linha += 1
             continue
 
@@ -260,25 +242,30 @@ def gera_planilhas_substituicoes():
         # verifica se o nome que consta na ocorrência está
         # na tabela de titulares
         if matricula in titulares:
-            titular = titulares[matricula]            
+            titular = titulares[matricula]
             titular.motivo_impedimento = pla_oco.getCellRangeByName(
                 f"F{linha}").getString()
 
             titular.dias_ocorrencia = int(pla_oco.getCellRangeByName(
                 f"I{linha}").getString())
 
-            # insere uma planilha no final com o nome do titular
-            if not planilhas.hasByName(titular.nome_formatado):
+            # se o titular não tem substitutos, pula para a próxima linha
+            if len(titular.substitutos) == 0:
+                linha += 1
+                continue
+
+            # insere uma planilha no final com o nome do primeiro substituto do titular
+            if not planilhas.hasByName(titular.substitutos[0].nome_formatado):
                 # planilhas.insertNewByName(titular.nome_formatado, planilhas.Count)
                 planilhas.copyByName(
-                    PLA_MODL, titular.nome_formatado, planilhas.Count)
+                    PLA_MODL, titular.substitutos[0].nome_formatado, planilhas.Count)
 
-            planilha_substituicao = planilhas.getByName(titular.nome)
+            planilha_substituicao = planilhas.getByName(
+                titular.substitutos[0].nome_formatado)
 
             # apaga o botão Gerar Planilhas
             colunas = planilha_substituicao.getColumns()
             colunas.removeByIndex(11, 2)
-
 
             pla_modelo = planilhas.getByName(PLA_MODL)
 
@@ -294,8 +281,6 @@ def gera_planilhas_substituicoes():
                 "F11").setString(primeiro_subs.categoria)
             planilha_substituicao.getCellRangeByName(
                 "E12").setString(primeiro_subs.nome_formatado)
-            planilha_substituicao.getCellRangeByName(
-                "E13").setString(primeiro_subs.funcao_titular)
 
             if len(titular.substitutos) > 1:
                 for i in range(1, len(titular.substitutos)):
