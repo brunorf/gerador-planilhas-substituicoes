@@ -330,11 +330,16 @@ def gera_planilha_substituicao(ocorrencia):
     planilha_substituicao.getCellRangeByName(
         "E12").setString(primeiro_subs.nome_formatado)
 
+    # lista os demais substitutos na coluna I
+    # para facilitar a alteração manual caso
+    # seja necessária
     if len(titular.substitutos) > 1:
         for i in range(1, len(titular.substitutos)):
             subs = titular.substitutos[i]
             planilha_substituicao.getCellRangeByName(
                 f"I{11+i}").setString(subs.nome_formatado)
+            planilha_substituicao.getCellRangeByName(
+                f"J{11+i}").setString(subs.matricula)
 
     planilha_substituicao.getCellRangeByName(
         "E16").setString(titular.matricula)
